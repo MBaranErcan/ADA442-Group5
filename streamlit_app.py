@@ -499,6 +499,8 @@ for name, model in models.items():
         }
 
 
+
+
 # 5) Display all results
 st.write("Tuned Hyperparameters (scoring=f1_macro):")
 st.write(f"{'Model':<30} {'Dataset':<30} {'Best F1 Macro':<15} {'Best Params':<50}")
@@ -553,3 +555,37 @@ recall = recall_score(y_test_dropped, y_pred, pos_label='yes')
 f1 = f1_score(y_test_dropped, y_pred, pos_label='yes')
 st.write(f"\nPipeline Model Evaluation:")
 st.write(f"{'Model':<30} {'Dataset':<30} {'Accuracy':<10} {'Precision':<10} {'Recall':<10} {'F1 Score':<10}")
+
+
+
+st.markdown("---")
+st.markdown("## Let's try ourself with fresh data!")
+
+
+# Create input widgets
+age = st.slider("Age", 18, 95, 30)
+campaign = st.slider("Number of contacts during this campaign", 1, 30, 1)
+previous = st.slider("Previous contacts", 0, 10, 0)
+emp_var_rate = st.number_input("Employment variation rate", value=1.1)
+cons_price_idx = st.number_input("Consumer price index", value=93.2)
+cons_conf_idx = st.number_input("Consumer confidence index", value=-40.0)
+euribor3m = st.number_input("Euribor 3-month rate", value=4.0)
+nr_employed = st.number_input("Number of employees", value=5191.0)
+
+# Create a new sample with the right column order
+sample = pd.DataFrame([{
+    'age': age,
+    'campaign': campaign,
+    'previous': previous,
+    'emp.var.rate': emp_var_rate,
+    'cons.price.idx': cons_price_idx,
+    'cons.conf.idx': cons_conf_idx,
+    'euribor3m': euribor3m,
+    'nr.employed': nr_employed
+}])
+
+# Use the trained pipeline to predict
+if st.button("Predict Subscription"):
+    prediction = pipeline.predict(sample)[0]
+    probability = pipeline.predict_proba(sample)[0][1]  # probability of 'yes'
+    st.success(f"Prediction: {prediction.upper()} (Confidence: {probability:.2%})")
